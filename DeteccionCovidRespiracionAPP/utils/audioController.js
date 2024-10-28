@@ -1,4 +1,3 @@
-// audioController.js
 import { Audio } from 'expo-av';
 
 export async function startRecording(setRecording, setIsRecording) {
@@ -18,9 +17,6 @@ export async function startRecording(setRecording, setIsRecording) {
       setRecording(recording);
       setIsRecording(true);
       console.log('Recording started');
-      
-      // Stop recording after 5 seconds
-      setTimeout(() => stopRecording(recording, setIsRecording, setRecording), 5000);
     } else {
       console.error('Permission not granted');
     }
@@ -29,7 +25,7 @@ export async function startRecording(setRecording, setIsRecording) {
   }
 }
 
-export async function stopRecording(recording, setIsRecording, setRecording, setSound) {
+export async function stopRecording(recording, setIsRecording, setRecording, setSound, setAudioUri) {
   if (!recording) {
     console.log('No recording found');
     return;
@@ -43,6 +39,7 @@ export async function stopRecording(recording, setIsRecording, setRecording, set
     const uri = recording.getURI();
     console.log('Recording stopped and stored at', uri);
 
+    setAudioUri(uri); // Guardar la URI del audio
     const { sound } = await recording.createNewLoadedSoundAsync();
     setSound(sound);
     setRecording(null); // Reset the recording state
