@@ -1,0 +1,32 @@
+{
+  "name": "deteccioncovidapp",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^14.0.4",
+    "expo": "~51.0.28",
+    "expo-av": "~14.0.7",
+    "expo-linear-gradient": "^13.0.2",
+    "expo-permissions": "^14.4.0",
+    "expo-status-bar": "~1.12.1",
+    "nativewind": "^2.0.11",
+    "react": "18.2.0",
+    "react-audio-visualize": "^1.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "0.74.5",
+    "react-native-audio-record": "^0.2.2",
+    "react-native-chart-kit": "^6.12.0",
+    "react-native-svg": "^15.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "tailwindcss": "^3.3.2"
+  },
+  "private": true
+}
