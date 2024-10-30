@@ -1,5 +1,7 @@
 # Procesamiento de Datos de Sonidos Respiratorios (audio_espectrograma)
 
+LINK DEL VIDEO : https://youtu.be/u7TTf8dDqbk
+
 Este notebook, `audio_espectrograma.ipynb`, forma parte de un proyecto de análisis de datos de sonidos respiratorios. Procesa y prepara un conjunto de datos para su análisis, específicamente para clasificar el estado de COVID de los individuos en función de los sonidos respiratorios capturados.
 
 ## Descripción
