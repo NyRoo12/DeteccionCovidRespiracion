@@ -1,68 +1,41 @@
-// Spectrogram.js
-import React, { useEffect, useRef } from 'react';
-import { View, Text } from 'react-native';
-import { Audio } from 'expo-av'; // Asegúrate de que esta importación esté aquí
-import { LineChart } from 'react-native-chart-kit'; // O cualquier biblioteca que estés usando para el espectrograma
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import axios from 'axios';
 
 const Spectrogram = ({ audioUri }) => {
-  const sound = useRef(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const loadSound = async () => {
-      if (audioUri) {
-        const { sound: playbackObject } = await Audio.Sound.createAsync(
-          { uri: audioUri }
-        );
-        sound.current = playbackObject;
+  const fetchSpectrogram = async () => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('file', {
+      uri: audioUri,
+      type: "audio/m4a",
+      name: "recording.m4a",
+    });
 
-        playbackObject.setOnPlaybackStatusUpdate(status => {
-          if (status.didJustFinish) {
-            playbackObject.unloadAsync();
-          }
-        });
-      }
-    };
-
-    loadSound();
-
-    return () => {
-      if (sound.current) {
-        sound.current.unloadAsync();
-      }
-    };
-  }, [audioUri]);
+    try {
+      await axios.post('http://192.168.1.100:5000/generar_espectrograma', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      Alert.alert("Éxito", "El espectrograma ha sido generado.");
+    } catch (error) {
+      console.error("Error al generar el espectrograma:", error);
+      Alert.alert("Error", "No se pudo generar el espectrograma. Por favor, intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <View className="flex-1 justify-center items-center p-4 bg-gray-100">
-      <Text className="text-xl font-bold mb-4">Espectrograma</Text>
-      {/* Aquí puedes renderizar el gráfico del espectrograma */}
-      <LineChart
-        data={{
-          labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
-          datasets: [
-            {
-              data: [20, 45, 28, 80],
-            },
-          ],
-        }}
-        width={400} // Ancho del gráfico
-        height={220} // Alto del gráfico
-        yAxisLabel=""
-        chartConfig={{
-          backgroundColor: '#e26a00',
-          backgroundGradientFrom: '#fb8c00',
-          backgroundGradientTo: '#ffa726',
-          decimalPlaces: 2, // Opcional, por defecto es 2
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-        }}
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-        }}
-      />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: '#f3f3f3' }}>
+      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16 }}>Espectrograma</Text>
+      <TouchableOpacity onPress={fetchSpectrogram} style={{ backgroundColor: '#007bff', padding: 10, borderRadius: 8 }}>
+        <Text style={{ color: 'white' }}>Generar Espectrograma</Text>
+      </TouchableOpacity>
+      {loading && <ActivityIndicator size="large" color="#0000ff" />}
     </View>
   );
 };

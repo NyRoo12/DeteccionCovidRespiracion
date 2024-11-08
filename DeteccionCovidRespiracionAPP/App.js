@@ -1,11 +1,10 @@
-// app.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import RecordingButton from './components/RecordingButton';
 import { startRecording, stopRecording, playSound } from './utils/audioController';
 import { FontAwesome } from '@expo/vector-icons'; 
-import Spectrogram from './components/Spectrogram';
+import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient'; 
 
 export default function App() {
@@ -14,7 +13,7 @@ export default function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioUri, setAudioUri] = useState(null);
-  const [showSpectrogram, setShowSpectrogram] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -35,9 +34,32 @@ export default function App() {
   };
 
   const handleDelete = () => {
-    // Implementa la lógica para eliminar el audio aquí
     setSound(null);
     setAudioUri(null);
+  };
+
+  const fetchSpectrogram = async () => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('file', {
+      uri: audioUri,
+      type: "audio/m4a",
+      name: "recording.m4a",
+    });
+
+    try {
+      await axios.post('http://192.168.1.100:5000/generar_espectrograma', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      Alert.alert("Éxito", "El espectrograma ha sido generado.");
+    } catch (error) {
+      console.error("Error al generar el espectrograma:", error);
+      Alert.alert("Error", "No se pudo generar el espectrograma. Por favor, intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,16 +68,13 @@ export default function App() {
       colors={['#FFFFFF', '#65E9F5']}
       start={{ x: 0, y: 0.9 }}
     >
-      {/* Contenedor para el contador de tiempo */}
       <View className="mb-4">
         <Text className="text-2xl font-bold text-black">
           {formatTime(recordingTime)}
         </Text>
       </View>
 
-      {/* Contenedor para los círculos de fondo */}
       <View className="absolute top-20">
-        {/* Círculos de fondo con relleno de color y opacidad */}
         <View
           className="absolute rounded-full"
           style={{
@@ -94,7 +113,6 @@ export default function App() {
         />
       </View>
 
-      {/* Contenedor para el botón de grabación */}
       <View className="absolute top-20">
         <RecordingButton
           isRecording={isRecording}
@@ -114,7 +132,6 @@ export default function App() {
         />
       </View>
 
-      {/* Contenedor para botones de control de audio */}
       <View className="absolute bottom-32 flex-row justify-between w-full px-10">
         {sound && (
           <>
@@ -135,20 +152,17 @@ export default function App() {
         )}
       </View>
 
-      {/* Botón para analizar el audio solo si hay un audio para analizar */}
-      {audioUri && (
+      {audioUri && !loading && (
         <TouchableOpacity
-          onPress={() => setShowSpectrogram(true)}
+          onPress={fetchSpectrogram}
           className="p-4 bg-yellow-500 rounded-lg w-48 flex items-center absolute bottom-10"
         >
           <Text className="text-lg font-semibold text-white">Analizar Audio</Text>
         </TouchableOpacity>
       )}
 
-      {showSpectrogram && audioUri && (
-        <Spectrogram audioUri={audioUri} />
-      )}
-    
+      {loading && <ActivityIndicator size="large" color="#0000ff" className="absolute bottom-10" />}
+      
       <StatusBar style="auto" />
     </LinearGradient>
   );
