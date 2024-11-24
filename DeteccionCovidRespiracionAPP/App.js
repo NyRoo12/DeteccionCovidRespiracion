@@ -4,8 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import RecordingButton from './components/RecordingButton';
 import { startRecording, stopRecording, playSound } from './utils/audioController';
 import { FontAwesome } from '@expo/vector-icons'; 
-import axios from 'axios';
-import { LinearGradient } from 'expo-linear-gradient'; 
+import { LinearGradient } from 'expo-linear-gradient';
+import { fetchSpectrogram } from './components/Spectrogram'; // Importa la función desde Spectrogram.js
 
 export default function App() {
   const [recording, setRecording] = useState(null);
@@ -38,30 +38,6 @@ export default function App() {
     setAudioUri(null);
   };
 
-  const fetchSpectrogram = async () => {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', {
-      uri: audioUri,
-      type: "audio/m4a",
-      name: "recording.m4a",
-    });
-
-    try {
-      await axios.post('http://192.168.1.100:5000/generar_espectrograma', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      Alert.alert("Éxito", "El espectrograma ha sido generado.");
-    } catch (error) {
-      console.error("Error al generar el espectrograma:", error);
-      Alert.alert("Error", "No se pudo generar el espectrograma. Por favor, intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <LinearGradient
       className="flex-1 justify-center items-center pt-4"
@@ -72,45 +48,6 @@ export default function App() {
         <Text className="text-2xl font-bold text-black">
           {formatTime(recordingTime)}
         </Text>
-      </View>
-
-      <View className="absolute top-20">
-        <View
-          className="absolute rounded-full"
-          style={{
-            width: 320,
-            height: 320,
-            borderRadius: 160,
-            backgroundColor: isRecording ? 'rgba(255, 78, 78, 0.2)' : 'rgba(0, 184, 255, 0.2)',
-            top: -30,
-            left: -160,
-            opacity: 0.3,
-          }}
-        />
-        <View
-          className="absolute rounded-full"
-          style={{
-            width: 290,
-            height: 290,
-            borderRadius: 145,
-            backgroundColor: isRecording ? 'rgba(255, 78, 78, 0.4)' : 'rgba(0, 184, 255, 0.4)',
-            top: -20,
-            left: -145,
-            opacity: 0.5,
-          }}
-        />
-        <View
-          className="absolute rounded-full"
-          style={{
-            width: 270,
-            height: 270,
-            borderRadius: 130,
-            backgroundColor: isRecording ? 'rgba(255, 78, 78, 0.6)' : 'rgba(0, 184, 255, 0.6)',
-            top: -10,
-            left: -135,
-            opacity: 0.8,
-          }}
-        />
       </View>
 
       <View className="absolute top-20">
@@ -154,7 +91,7 @@ export default function App() {
 
       {audioUri && !loading && (
         <TouchableOpacity
-          onPress={fetchSpectrogram}
+          onPress={() => fetchSpectrogram(audioUri, setLoading)} // Usa la función importada
           className="p-4 bg-yellow-500 rounded-lg w-48 flex items-center absolute bottom-10"
         >
           <Text className="text-lg font-semibold text-white">Analizar Audio</Text>
