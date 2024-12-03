@@ -12,8 +12,8 @@ export default function RecordingButton({ isRecording, onPress }) {
         // Cambiamos los colores según si está grabando o no
         colors={isRecording ? ['#FF4E50', '#FF0000'] : ['#89CFF0', '#00BFFF']}
         style={{
-          width: 300, // Aumentamos el tamaño del botón
-          height: 300, // Aumentamos el tamaño del botón
+          width: 250, // Aumentamos el tamaño del botón
+          height: 250, // Aumentamos el tamaño del botón
           borderRadius: 200, // Para que siga siendo un círculo
           justifyContent: 'center',
           alignItems: 'center',
