@@ -6,10 +6,10 @@ import { Alert } from 'react-native';
  * @param {string} audioUri - URI del archivo de audio.
  * @param {function} setLoading - Función para manejar el estado de carga.
  */
+
 export const fetchSpectrogram = async (audioUri, setLoading) => {
   setLoading(true);
   const formData = new FormData();
-
   formData.append('file', {
     uri: audioUri,
     type: "audio/m4a",
@@ -17,15 +17,17 @@ export const fetchSpectrogram = async (audioUri, setLoading) => {
   });
 
   try {
-    await axios.post('http://192.168.1.100:5000/analizar_audio', formData, {
+    const response = await axios.post('http://192.168.1.154:5000/analizar_audio', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    Alert.alert("Éxito", "El espectrograma ha sido generado.");
+
+    const { confianza, mensaje } = response.data;
+    return { confianza, mensaje }; // Devuelve los datos
   } catch (error) {
     console.error("Error al generar el espectrograma:", error);
-    Alert.alert("Error", "No se pudo generar el espectrograma. Por favor, intenta de nuevo.");
+    throw error;
   } finally {
     setLoading(false);
   }

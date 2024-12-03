@@ -36,7 +36,7 @@ export async function startRecording(setRecording, setIsRecording) {
         playsInSilentModeIOS: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync(recordingOptions);
+      const { recording } = await Audio.Recording.createAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
       setRecording(recording);
       setIsRecording(true);
       console.log('Recording started');
